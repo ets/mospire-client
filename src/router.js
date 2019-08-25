@@ -13,10 +13,25 @@ export default new Router({
       component: Home
     },
     {
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import(/* webpackChunkName: "portal" */ './views/Dashboard.vue')
+    },    
+    {
       path: '/signup',
       name: 'signup',
-      component: () => import(/* webpackChunkName: "signup" */ './views/Signup.vue')
+      component: () => import(/* webpackChunkName: "signup" */ './views/SignUp.vue')
     },    
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import(/* webpackChunkName: "auth" */ './views/SignIn.vue')
+    },        
+    {
+      path: '/logout',
+      name: 'logout',
+      component: () => import(/* webpackChunkName: "auth" */ './views/SignOut.vue')
+    },            
     {
       path: '/about',
       name: 'about',

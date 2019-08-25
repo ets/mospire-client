@@ -29,5 +29,5 @@ npm run lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-### Icon Credits
-investment by hafiudin from the Noun Project
+### Credits
+See [CREDITS](./CREDITS.md).
