@@ -9,6 +9,9 @@
       <v-btn to="/" text>
         <span class="mr-2">Home</span>
       </v-btn>      
+      <v-btn v-if="signedIn" to="/dashboard" text>
+        <span class="mr-2">Dashboard</span>
+      </v-btn>            
       <v-btn v-if="!signedIn" to="/login" text>
         <span class="mr-2">Login</span>
       </v-btn>            
