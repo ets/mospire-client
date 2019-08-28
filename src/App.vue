@@ -12,11 +12,11 @@
       <v-btn v-if="signedIn" to="/dashboard" text>
         <span class="mr-2">Dashboard</span>
       </v-btn>            
-      <v-btn v-if="!signedIn" to="/login" text>
-        <span class="mr-2">Login</span>
+      <v-btn v-if="!signedIn" to="/signin" text>
+        <span class="mr-2">Sign In</span>
       </v-btn>            
-      <v-btn v-if="signedIn" to="/logout" text>
-        <span class="mr-2">Logout</span>
+      <v-btn v-if="signedIn" to="/signout" text>
+        <span class="mr-2">Sign Out</span>
       </v-btn>                  
       <v-btn to="/about" text>
         <span class="mr-2">About</span>
@@ -68,4 +68,20 @@ body {
   text-align: center;
   color: #2c3e50;
 }
+:root {
+  /* Colors from https://github.com/aws-amplify/amplify-js/blob/master/packages/amplify-ui/src/Theme.css */
+  --amazonOrange: #009900; /* Redefined to dark green */
+  --lightAmazonOrange: #FFAC31;
+  --darkAmazonOrange: #E88B01;
+  --squidInk: #232F3E;
+  --lightSquidInk: #31465F;
+  --deepSquidInk: #152939;
+  --grey: #828282;
+  --lightGrey: #C4C4C4;
+  --silver: #E1E4EA;
+  --darkBlue: #31465F;
+  --red: #DD3F5B;
+  --white: #FFFFFF;
+  --light-blue: #00a1c9;
+  }
 </style>

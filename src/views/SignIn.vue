@@ -1,7 +1,7 @@
 <template>
     <div id="app">
       <div v-if="!signedIn">
-         <amplify-authenticator></amplify-authenticator>
+         <amplify-authenticator v-bind:authConfig="authConfig"></amplify-authenticator>
       </div>      
     </div>
 </template>
@@ -27,7 +27,13 @@ export default {
     AmplifyEventBus.$on('authState', info => {
       if (info === 'signedIn') {
         this.signedIn = true
-        this.$router.replace({name: 'dashboard'})
+        if(this.$route.params.nextUrl != null){
+          this.$router.push(this.$route.params.nextUrl)
+        }else{
+          this.$router.replace({name: 'dashboard'})
+        }        
+      }else if (info === 'signIn') { //after signup process is completed
+
       } else {
         this.signedIn = false
       }
@@ -43,7 +49,35 @@ export default {
   data () {
     return {
       signOutOptions,
-      signedIn: false
+      signedIn: false,
+      authConfig: {
+        usernameAttributes: 'Email',
+        signInConfig:{
+          header: 'Sign In to your Mospire account.',
+        },
+        signUpConfig: {
+            header: 'Create a new Mospire account.',
+            hideAllDefaults: true,
+            defaultCountryCode: '1',
+            signUpFields: [
+              {
+                label: 'Email',
+                key: 'email',
+                required: true,
+                displayOrder: 1,
+                type: 'string',
+                signUpWith: true
+              },
+              {
+                label: 'Password',
+                key: 'password',
+                required: true,
+                displayOrder: 2,
+                type: 'password'
+              }
+            ]
+          }
+      }
     }
   }
 }

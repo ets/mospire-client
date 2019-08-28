@@ -22,7 +22,7 @@
     </v-card-text>
               <v-card-actions>
                 <div class="flex-grow-1"></div>
-                <v-btn color="primary" @click="submit" :disabled="!valid">Login</v-btn>
+                <v-btn color="primary" @click="submit" :disabled="!valid">SignIn</v-btn>
               </v-card-actions>
             </v-card>
           </v-col>

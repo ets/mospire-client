@@ -5,7 +5,11 @@ import NotFound from './views/NotFound.vue'
 
 Vue.use(Router)
 
-export default new Router({
+async function getAuthenticatedUser() {
+  return await Auth.currentAuthenticatedUser()
+} 
+
+let router = new Router({     
   routes: [
     {
       path: '/',
@@ -15,7 +19,10 @@ export default new Router({
     {
       path: '/dashboard',
       name: 'dashboard',
-      component: () => import(/* webpackChunkName: "portal" */ './views/Dashboard.vue')
+      component: () => import(/* webpackChunkName: "portal" */ './views/Dashboard.vue'),
+      meta: { 
+        requiresAuth: true
+      }
     },    
     {
       path: '/signup',
@@ -23,15 +30,17 @@ export default new Router({
       component: () => import(/* webpackChunkName: "signup" */ './views/SignUp.vue')
     },    
     {
-      path: '/login',
-      name: 'login',
+      path: '/signin',
+      name: 'signin',
       component: () => import(/* webpackChunkName: "auth" */ './views/SignIn.vue')
     },        
+    { path: '/login', redirect: '/signin' },
     {
-      path: '/logout',
-      name: 'logout',
-      component: () => import(/* webpackChunkName: "auth" */ './views/SignOut.vue')
-    },            
+      path: '/signout',
+      name: 'signout',
+      component: () => import(/* webpackChunkName: "auth" */ './views/SignOut.vue'),      
+    },        
+    { path: '/logout', redirect: '/signout' },  
     {
       path: '/about',
       name: 'about',
@@ -47,3 +56,34 @@ export default new Router({
     },
   ]
 })
+
+import { Auth } from 'aws-amplify'
+
+
+  
+router.beforeEach((to, from, next) => {
+  if(to.matched.some(record => record.meta.requiresAuth)) {    
+      try {
+        const user = getAuthenticatedUser()
+        if(to.matched.some(record => record.meta.is_admin)) {
+            if(user.is_admin == 1){
+                next()
+            }
+            else{
+                next({ name: 'dashboard'})
+            }
+        }else {          
+            next()
+        }
+      } catch (err) {
+        next({
+          path: '/login',
+          params: { nextUrl: to.fullPath }
+        })
+      }
+  }else {
+      next() 
+  }
+})
+
+export default router

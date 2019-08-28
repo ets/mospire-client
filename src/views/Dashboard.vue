@@ -5,14 +5,19 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify'
+import { Auth, API } from 'aws-amplify'
 
 export default {
   async beforeCreate() {
     try {
       this.user = await Auth.currentAuthenticatedUser();
+      API.get(apiName, path, myInit).then(response => {
+          // Add your code here
+      }).catch(error => {
+          console.log(error.response)
+      });
     } catch (err) {
-      this.$router.replace({name: 'login'})
+      this.$router.replace({name: 'signin'})
     }
   },    
   data () {
