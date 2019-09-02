@@ -30,36 +30,44 @@
 
 
 <script>
+import { mapGetters } from 'vuex'
 import { AmplifyEventBus } from 'aws-amplify-vue'
 import { Auth } from 'aws-amplify'
 
 export default {
-  async beforeCreate() {
-    try {
-      const user = await Auth.currentAuthenticatedUser()
-      this.signedIn = true
-    } catch (err) {
-      this.signedIn = false
-    }
+  async beforeCreate() {    
     AmplifyEventBus.$on('authState', info => {
-      console.log("Inside EventBus block: "+info)
       if (info === 'signedIn') {
-        this.signedIn = true        
-        if(this.$route.params.nextUrl != null){
-          this.$router.push(this.$route.params.nextUrl)
-        }else{
-          this.$router.push({name: 'dashboard'})
-        }              
+        Auth.currentAuthenticatedUser()
+            .then(user => {
+              this.$store.dispatch('setAuthenticatedUser', user)
+              this.signedIn = true
+              if(this.$route.params.nextUrl != null){
+                this.$router.push(this.$route.params.nextUrl)
+              }else{
+                this.$router.push({name: 'dashboard'})
+              }              
+            })
+            .catch(err => {
+              this.signedIn = false
+            });                
       } else if (info === 'signedOut'){
+        this.$store.dispatch('setAuthenticatedUser', null)
         this.signedIn = false
       } else if (info === 'signIn') { 
         this.$router.push({name: 'signin'})
       }
     });
   },    
+  computed: Object.assign({},
+    mapGetters([
+      'authenticatedUser'
+    ]),
+    {}
+  ),
   data () {
     return {
-      signedIn: false
+      signedIn: this.$store.getters.authenticatedUser != null
     }
   }
 }

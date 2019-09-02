@@ -14,12 +14,14 @@ export default {
     } catch (err) {
       this.$router.replace({name: 'signin'})
     }
-    // API.get(apiName, path, myInit).then(response => {
-    //     // Add your code here
-    // }).catch(error => {
-    //     console.log(error.response)
-    // });
   },    
+  mounted() {
+    API.get(apiName, '/v1/users', myInit).then(response => {
+        // Add your code here
+    }).catch(error => {
+        console.log(error.response)
+    });
+  },
   data () {
     return {
       user: null,

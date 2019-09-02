@@ -28,6 +28,3 @@ export default {
   }
 }
 </script>
-<!-- styling for the component -->
-<style>
-</style>

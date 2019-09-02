@@ -7,25 +7,19 @@
 </template>
 
 <script>
-import { Auth } from 'aws-amplify'
 import {AWSConfig} from '../plugins/amplify';
 
 
 export default {
   name: 'app',
-  async mounted () {
-    try {
-      const user = await Auth.currentAuthenticatedUser()
-      if(user){
-        this.$router.push({name: 'dashboard'})
-      }      
-    } catch (err) {
-      //ignore
-    }
-  },    
+  mounted () {
+    if(this.$store.getters.authenticatedUser){
+      this.$router.push({name: 'dashboard'})
+    }    
+  },
   data () {
     return {
-      authConfig: AWSConfig.authConfig,      
+      authConfig: AWSConfig.authConfig,
     }
   }
 }
