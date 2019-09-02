@@ -1,24 +1,29 @@
 <template>
+  <amplify-sign-out v-bind:signOutConfig="signOutConfig"></amplify-sign-out>
 </template>
 
 <script>
+import { AmplifyEventBus } from 'aws-amplify-vue'
 import { Auth } from 'aws-amplify'
+import {AWSConfig} from '../plugins/amplify';
 
-export default {
-  props: [ 'target'],
+export default {  
   mounted () {
     this.logout();    
-  },
+  },  
   methods: {    
     logout: async function () {
-      await Auth.signOut();
-      this.$router.replace({name: 'home'})
-      window.location = this.target
+      Auth.signOut()
+        .then(data => {
+          AmplifyEventBus.$emit('authState', 'signedOut')
+          this.$router.replace({name: 'home'})  
+        })        
     },
   },
   data () {
     return {
-      name: 'redirect'
+      signOutConfig: AWSConfig.authConfig.signOutConfig      
+      // Not using the component / view at all...
     }
   }
 }

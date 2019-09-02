@@ -1,6 +1,6 @@
 <template>
   <div class="home">    
-    <span>Hello {{ user.username }}, welcome to your dashboard.</span>
+    <span v-if="user">Hello {{ user.username }}, welcome to your dashboard.</span>
   </div>
 </template>
 
@@ -10,15 +10,15 @@ import { Auth, API } from 'aws-amplify'
 export default {
   async beforeCreate() {
     try {
-      this.user = await Auth.currentAuthenticatedUser();
-      API.get(apiName, path, myInit).then(response => {
-          // Add your code here
-      }).catch(error => {
-          console.log(error.response)
-      });
+      this.user = await Auth.currentAuthenticatedUser();      
     } catch (err) {
       this.$router.replace({name: 'signin'})
     }
+    // API.get(apiName, path, myInit).then(response => {
+    //     // Add your code here
+    // }).catch(error => {
+    //     console.log(error.response)
+    // });
   },    
   data () {
     return {

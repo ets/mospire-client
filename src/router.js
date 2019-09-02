@@ -10,6 +10,7 @@ async function getAuthenticatedUser() {
 } 
 
 let router = new Router({     
+  mode: 'history',
   routes: [
     {
       path: '/',

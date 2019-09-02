@@ -42,10 +42,18 @@ export default {
       this.signedIn = false
     }
     AmplifyEventBus.$on('authState', info => {
+      console.log("Inside EventBus block: "+info)
       if (info === 'signedIn') {
-        this.signedIn = true
+        this.signedIn = true        
+        if(this.$route.params.nextUrl != null){
+          this.$router.push(this.$route.params.nextUrl)
+        }else{
+          this.$router.push({name: 'dashboard'})
+        }              
       } else if (info === 'signedOut'){
         this.signedIn = false
+      } else if (info === 'signIn') { 
+        this.$router.push({name: 'signin'})
       }
     });
   },    

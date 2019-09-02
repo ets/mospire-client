@@ -13,6 +13,45 @@ let aws_config = {
     USER_POOL_ID: "us-east-1_yknLD7PcH",
     APP_CLIENT_ID: "4eqqvdchbqaf852j4njog4n7k0",
     IDENTITY_POOL_ID: "us-east-1:ce021e69-d17c-4431-a358-12992057d044"
+  },
+  authConfig: {
+    usernameAttributes: 'Email',
+    signInConfig:{
+      header: 'Sign In to your Mospire account.',
+    },
+    signOutConfig: {
+      msg: 'You are currently signed in.', // type: string, default: null
+      signOutButton: 'Sign Out', // type: string, default: 'Sign Out', required: false      
+    },
+    signUpConfig: {
+        header: 'Create a new Mospire account.',
+        hideAllDefaults: true,
+        defaultCountryCode: '1',
+        signUpFields: [
+          {
+            label: 'Name',
+            key: 'name',
+            required: false,
+            displayOrder: 1,
+            type: 'string',
+          },              
+          {
+            label: 'Email',
+            key: 'email',
+            required: true,
+            displayOrder: 2,
+            type: 'string',
+            signUpWith: true
+          },
+          {
+            label: 'Password',
+            key: 'password',
+            required: true,
+            displayOrder: 3,
+            type: 'password'
+          }
+        ]
+      }
   }
 };
 
@@ -36,4 +75,5 @@ Amplify.configure({
 });
 
 Vue.use(AmplifyPlugin, AmplifyModules)
+export const AWSConfig = aws_config
 export default Amplify
