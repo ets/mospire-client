@@ -6,7 +6,7 @@ import { AmplifyPlugin } from 'aws-amplify-vue'
 let aws_config = {
   apiGateway: {
     REGION: "us-east-1",
-    URL: "https://api.mospire.com/"
+    URL: "https://api.mospire.com"
   },
   cognito: {
     REGION: "us-east-1",

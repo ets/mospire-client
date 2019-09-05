@@ -1,30 +1,65 @@
 <template>
-  <div class="home">    
-    <span v-if="user">Hello {{ user.username }}, welcome to your dashboard.</span>
-  </div>
+  
+  <v-list dense>
+    <v-subheader>{{ authenticatedUser.username }}'s accounts</v-subheader>
+    <v-list-item-group v-model="account" color="primary">
+      <v-list-item
+        v-for="(account, i) in accounts"
+        :key="i"
+      >
+        <v-list-item-content>
+          <v-list-item-title v-text="account.broker_name"></v-list-item-title>
+        </v-list-item-content>
+      </v-list-item>
+    </v-list-item-group>
+  </v-list>
+
 </template>
 
 <script>
-import { Auth, API } from 'aws-amplify'
+import { API } from 'aws-amplify'
+import { mapGetters } from 'vuex'
 
 export default {
-  async beforeCreate() {
-    try {
-      this.user = await Auth.currentAuthenticatedUser();      
-    } catch (err) {
-      this.$router.replace({name: 'signin'})
-    }
-  },    
   mounted() {
-    API.get(apiName, '/v1/users', myInit).then(response => {
-        // Add your code here
-    }).catch(error => {
-        console.log(error.response)
-    });
+    this.fetchDashboard();
   },
+  methods: {
+    fetchDashboard: function () {
+      API.get('mospire', '/v1/accounts').then(response => {
+          this.accounts = response.data
+      }).catch(error => {
+          console.error("Unable to fetch user's accounts: "+error)
+      });
+    },
+    createMospireUser: function () {
+      const userEmail = this.$store.getters.authenticatedUser.attributes.email
+      let name = this.$store.getters.authenticatedUser.attributes.name ? this.$store.getters.authenticatedUser.attributes.name 
+        : userEmail.substring(0, userEmail.indexOf('@') );
+      let myInit = {
+        body: {
+          'email':  userEmail,
+          'first_name': name,
+        }, 
+        headers: {} // OPTIONAL
+      }
+      API.post('mospire', '/v1/users', myInit).then(response => {
+          this.fetchDashboard();
+      }).catch(error => {
+          console.error("Unable to create mospire user: "+error)
+      });
+    }
+  },
+  computed: Object.assign({},
+    mapGetters([
+      'authenticatedUser'
+    ]),
+    {}
+  ),
   data () {
     return {
-      user: null,
+      account: 0,
+      accounts: []
     }
   }
 }

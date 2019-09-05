@@ -1,13 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from './store'
 import Home from './views/Home.vue'
 import NotFound from './views/NotFound.vue'
 
 Vue.use(Router)
-
-async function getAuthenticatedUser() {
-  return await Auth.currentAuthenticatedUser()
-} 
 
 let router = new Router({     
   mode: 'history',
@@ -40,6 +37,9 @@ let router = new Router({
       path: '/signout',
       name: 'signout',
       component: () => import(/* webpackChunkName: "auth" */ './views/SignOut.vue'),      
+      meta: { 
+        requiresAuth: true
+      }
     },        
     { path: '/logout', redirect: '/signout' },  
     {
@@ -58,30 +58,27 @@ let router = new Router({
   ]
 })
 
-import { Auth } from 'aws-amplify'
-
-
   
 router.beforeEach((to, from, next) => {
-  if(to.matched.some(record => record.meta.requiresAuth)) {    
-      try {
-        const user = getAuthenticatedUser()
-        if(to.matched.some(record => record.meta.is_admin)) {
-            if(user.is_admin == 1){
-                next()
-            }
-            else{
-                next({ name: 'dashboard'})
-            }
-        }else {          
+  if(to.matched.some(record => record.meta.requiresAuth)) {          
+    const user = store.getters.authenticatedUser
+    if(user){
+      if(to.matched.some(record => record.meta.is_admin)) {
+        if(user.is_admin == 1){
             next()
         }
-      } catch (err) {
-        next({
-          path: '/login',
-          params: { nextUrl: to.fullPath }
-        })
+        else{
+            next({ name: 'dashboard'})
+        }
+      }else {          
+            next()
       }
+    }else{
+      next({
+        path: '/signin',
+        params: { nextUrl: to.fullPath }
+      })
+    }      
   }else {
       next() 
   }
