@@ -8,7 +8,7 @@ import { Auth } from 'aws-amplify'
 import {AWSConfig} from '../plugins/amplify';
 
 export default {  
-  beforeCreate () {
+  mounted () {
     this.logout();    
   },  
   methods: {    

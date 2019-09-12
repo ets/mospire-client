@@ -10,9 +10,9 @@ let aws_config = {
   },
   cognito: {
     REGION: "us-east-1",
-    USER_POOL_ID: "us-east-1_yknLD7PcH",
-    APP_CLIENT_ID: "4eqqvdchbqaf852j4njog4n7k0",
-    IDENTITY_POOL_ID: "us-east-1:ce021e69-d17c-4431-a358-12992057d044"
+    USER_POOL_ID: "us-east-1_4yDF44akh",
+    APP_CLIENT_ID: "42a93lddmohtb1jmievl74ibmb",
+    IDENTITY_POOL_ID: "us-east-1:f7a84e17-debe-4b4c-8356-2df91bdf772a"
   },
   authConfig: {
     usernameAttributes: 'Email',

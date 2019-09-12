@@ -41,7 +41,8 @@ export default {
         Auth.currentAuthenticatedUser()
             .then(user => {
               this.$store.dispatch('setAuthenticatedUser', user)
-              this.signedIn = true
+              this.signedIn = true              
+              this.refreshIdleTimeout()
               if(this.$route.params.nextUrl != null){
                 this.$router.push(this.$route.params.nextUrl)
               }else{
@@ -57,8 +58,24 @@ export default {
       } else if (info === 'signIn') { 
         this.$router.push({name: 'signin'})
       }
-    });
-  },    
+    });    
+  },
+  mounted: function () {
+    document.addEventListener('click', this.refreshIdleTimeout)
+  },
+  beforeDestroy: function () {
+    document.removeEventListener('click', this.refreshIdleTimeout)
+  },
+  methods:{
+    refreshIdleTimeout () {
+      if(this.idleTimeout) clearTimeout(this.idleTimeout)
+      if(this.signedIn) {
+        this.idleTimeout = setTimeout(() => {
+          this.$router.push({name: 'signout'})
+        }, 30 * 60 * 1000)      
+      }      
+    }
+  },
   computed: Object.assign({},
     mapGetters([
       'authenticatedUser'
@@ -67,6 +84,7 @@ export default {
   ),
   data () {
     return {
+      idleTimeout: null,
       signedIn: this.$store.getters.authenticatedUser != null
     }
   }

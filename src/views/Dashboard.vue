@@ -29,6 +29,7 @@ export default {
       API.get('mospire', '/v1/accounts').then(response => {
           this.accounts = response.data
       }).catch(error => {
+        //TODO: look for unauthorized and trigger signedout
           console.error("Unable to fetch user's accounts: "+error)
       });
     },
