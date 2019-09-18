@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Amplify, * as AmplifyModules from 'aws-amplify'
+import { Auth } from 'aws-amplify'
 import { AmplifyPlugin } from 'aws-amplify-vue'
 
 
@@ -10,9 +11,8 @@ let aws_config = {
   },
   cognito: {
     REGION: "us-east-1",
-    USER_POOL_ID: "us-east-1_4yDF44akh",
-    APP_CLIENT_ID: "42a93lddmohtb1jmievl74ibmb",
-    IDENTITY_POOL_ID: "us-east-1:f7a84e17-debe-4b4c-8356-2df91bdf772a"
+    APP_CLIENT_ID: "5p860tpu5f8rgnpjsq68nra9nn",
+    USER_POOL_ID: "us-east-1_IqkdYtxXH",
   },
   authConfig: {
     usernameAttributes: 'Email',
@@ -60,7 +60,6 @@ Amplify.configure({
     mandatorySignIn: true,
     region: aws_config.cognito.REGION,
     userPoolId: aws_config.cognito.USER_POOL_ID,
-    identityPoolId: aws_config.cognito.IDENTITY_POOL_ID,
     userPoolWebClientId: aws_config.cognito.APP_CLIENT_ID
   },
   API: {
@@ -68,7 +67,10 @@ Amplify.configure({
       {
         name: "mospire",
         endpoint: aws_config.apiGateway.URL,
-        region: aws_config.apiGateway.REGION
+        region: aws_config.apiGateway.REGION,
+        custom_header: async () => {           
+          return { "Mospire-Auth": `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}` }
+        }
       },
     ]
   }
