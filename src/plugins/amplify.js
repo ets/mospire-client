@@ -7,7 +7,7 @@ import { AmplifyPlugin } from 'aws-amplify-vue'
 let aws_config = {
   apiGateway: {
     REGION: "us-east-1",
-    URL: "https://api.mospire.com"
+    URL: "http://127.0.0.1:8000"
   },
   cognito: {
     REGION: "us-east-1",
@@ -69,7 +69,7 @@ Amplify.configure({
         endpoint: aws_config.apiGateway.URL,
         region: aws_config.apiGateway.REGION,
         custom_header: async () => {           
-          return { "Mospire-Auth": `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}` }
+          return { Authorization: `Bearer ${(await Auth.currentSession()).getAccessToken().getJwtToken()}` }
         }
       },
     ]
