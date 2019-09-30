@@ -19,5 +19,10 @@ export default new Vuex.Store({
   },
   getters: {
     authenticatedUser: state => state.authenticatedUser,
+    authenticatedUserFirstName: function (state) {
+      const name = state.authenticatedUser.attributes.name ? state.authenticatedUser.attributes.name : 
+        state.authenticatedUser.attributes.email.substring(0, state.authenticatedUser.attributes.email.indexOf('@') );
+      return name
+    }
   }
 })

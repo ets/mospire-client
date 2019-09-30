@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div class="signin">
       <div>
          <amplify-authenticator v-bind:authConfig="authConfig"></amplify-authenticator>
       </div>      

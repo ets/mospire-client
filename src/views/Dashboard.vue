@@ -1,19 +1,13 @@
 <template>
-  
-  <v-list dense>
-    <v-subheader>{{ authenticatedUser.username }}'s accounts</v-subheader>
-    <v-list-item-group v-model="account" color="primary">
-      <v-list-item
-        v-for="(account, i) in accounts"
-        :key="i"
-      >
-        <v-list-item-content>
-          <v-list-item-title v-text="account.broker_name"></v-list-item-title>
-        </v-list-item-content>
-      </v-list-item>
-    </v-list-item-group>
-  </v-list>
-
+  <div class="dashboard">
+    <v-subheader>Your Accounts</v-subheader>
+    <v-data-table
+      :headers="headers"
+      :items="accounts"
+      :items-per-page="20"
+      class="elevation-1"
+    ></v-data-table>
+  </div>
 </template>
 
 <script>
@@ -22,21 +16,23 @@ import { mapGetters } from 'vuex'
 
 export default {
   mounted() {
-    this.fetchDashboard();
+    this.fetchDashboard();    
   },
-  methods: {
+  methods: { 
     fetchDashboard: function () {
       API.get('mospire', '/v1/accounts').then(response => {
-          this.accounts = response.data
+          this.accounts = response.data          
       }).catch(error => {
-        //TODO: look for unauthorized and trigger signedout
-          console.error("Unable to fetch user's accounts: "+error)
+        if(error.response.status === 404){
+          this.createMospireUser()
+        }else{
+          console.error(error)
+        }        
       });
     },
     createMospireUser: function () {
       const userEmail = this.$store.getters.authenticatedUser.attributes.email
-      let name = this.$store.getters.authenticatedUser.attributes.name ? this.$store.getters.authenticatedUser.attributes.name 
-        : userEmail.substring(0, userEmail.indexOf('@') );
+      let name = this.$store.getters.authenticatedUserFirstName
       let myInit = {
         body: {
           'email':  userEmail,
@@ -53,14 +49,24 @@ export default {
   },
   computed: Object.assign({},
     mapGetters([
-      'authenticatedUser'
+      'authenticatedUser',
+      'authenticatedUserFirstName'
     ]),
     {}
   ),
   data () {
     return {
       account: 0,
-      accounts: []
+      accounts: [],
+      headers: [
+        {
+          text: 'Broker Name',
+          align: 'left',
+          sortable: true,
+          value: 'broker_name',
+        },
+        { text: 'Account Number', value: 'identifier' }
+      ]
     }
   }
 }

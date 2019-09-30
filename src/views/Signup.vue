@@ -1,5 +1,5 @@
 <template>
-    <div id="app">
+    <div class="signup">
       <div>
         <amplify-sign-up v-bind:signUpConfig="signUpConfig"></amplify-sign-up>
       </div>      
