@@ -75,15 +75,12 @@ import { mapGetters } from 'vuex'
 
 export default {
   mounted() {
-    this.fetchDashboard();    
+    this.fetchDashboard();
   },
   methods: { 
     fetchDashboard: function () {
       API.get('mospire', '/v1/accounts').then(response => {          
-          //this.accounts = response.data          
-          this.accounts = [
-            {id: 234, broker_name:'Fidelity', identifier:"AS425FGF-ASW333"}
-          ]
+          this.accounts = response.accounts
       }).catch(error => {
         if(error.response.status === 404){
           this.createMospireUser()
@@ -99,8 +96,7 @@ export default {
         body: {
           'email':  userEmail,
           'first_name': name,
-        }, 
-        headers: {} // OPTIONAL
+        }
       }
       API.post('mospire', '/v1/users', myInit).then(response => {
           this.fetchDashboard();
@@ -116,7 +112,12 @@ export default {
 
     deleteItem (item) {
       const index = this.accounts.indexOf(item)
-      confirm('Are you sure you want to delete this account?') && this.accounts.splice(index, 1)
+      if ( confirm('Are you sure you want to delete this account?') ){
+        this.accounts.splice(index, 1);
+        API.del('mospire', '/v1/accounts/'+item.id).catch(error => {
+            this.fetchDashboard();
+        });        
+      }        
     },
 
     close () {
@@ -127,12 +128,24 @@ export default {
       }, 300)
     },
 
-    save () {
-      //TODO: persist changes
+    save () {      
       if (this.editedIndex > -1) {
         Object.assign(this.accounts[this.editedIndex], this.editedItem)
+        let myInit = {
+          body: this.editedItem
+        }    
+        API.put('mospire', '/v1/accounts/'+this.editedItem.id, myInit ).catch(error => {
+            this.fetchDashboard();
+        });        
       } else {
-        this.accounts.push(this.editedItem)
+        this.accounts.push(this.editedItem)   
+        let myInit = {
+          body: this.editedItem
+        }    
+        API.post('mospire', '/v1/accounts', myInit ).then(this.fetchDashboard()).catch(error => {
+            this.accounts.splice(this.accounts.indexOf(this.editedItem), 1)
+            console.error("Unable to create new account: "+error)            
+        });        
       }
       this.close()
     },    
