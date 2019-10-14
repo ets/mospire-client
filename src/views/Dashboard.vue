@@ -2,23 +2,22 @@
 <v-data-table
     :headers="headers"
     :items="accounts"
-    :items-per-page="20"
+    :items-per-page="10"    
+    v-on:click:row="showAccount"    
     sort-by="broker_name"
-    class="elevation-1"
+    single-select    
+    class="elevation-1"    
     loading-text="Loading... Please wait"
   >
-    <template v-slot:top>
+    <template v-slot:top>    
+      <v-breadcrumbs large :items="crumbs"></v-breadcrumbs>
       <v-toolbar flat color="white">
         <v-toolbar-title>Your Accounts</v-toolbar-title>
-        <v-divider
-          class="mx-4"
-          inset
-          vertical
-        ></v-divider>
+        
         <div class="flex-grow-1"></div>        
         <v-dialog v-model="dialog" max-width="500px">          
-          <template v-slot:activator="{ on }">            
-            <v-btn color="primary" dark class="mb-2" v-on="on">New Account</v-btn>
+          <template v-slot:activator="{ on }">        
+            <v-btn color="blue darken-1" v-on="on" text>New Account</v-btn>    
           </template>
           <v-card>
             <v-card-title>
@@ -81,11 +80,23 @@ export default {
     fetchDashboard: function () {
       API.get('mospire', '/v1/accounts').then(response => {          
           this.accounts = response.accounts
+          if(this.accounts.length > 0){
+            // Pull IRR
+            let myInit = {
+              body: {
+                'email':  userEmail,
+              }
+            }
+            API.get('mospire', '/v1/transactions/analysis', myInit).then(response => {
+              
+            })
+          }
       }).catch(error => {
-        if(error.response.status === 404){
+        if (error.status && error.response.status === 404){
           this.createMospireUser()
         }else{
-          console.error(error)
+          console.log(error.response ? error.response : error.message)
+          //TODO: display errors by recording them in vuex and binding that in an Alert component in App
         }        
       });
     },
@@ -103,6 +114,9 @@ export default {
       }).catch(error => {
           console.error("Unable to create mospire user: "+error)
       });
+    },
+    showAccount(item){
+      this.$router.push({name: 'account',  params: { accountId: item.id }})      
     },
     editItem (item) {
       this.editedIndex = this.accounts.indexOf(item)
@@ -168,9 +182,14 @@ export default {
   },
   data () {
     return {
-      account: 0,
+      crumbs: [
+        {
+          text: 'Dashboard',          
+          to: '/dashboard',
+          disabled: true,
+        },                
+      ],
       dialog: false,
-      search: '',
       accounts: [],
       headers: [
         {

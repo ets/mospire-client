@@ -22,7 +22,7 @@
         <span class="mr-2">About</span>
       </v-btn>
     </v-app-bar>    
-    <v-content>
+    <v-content>      
       <router-view/>
     </v-content>
   </v-app>
@@ -84,7 +84,7 @@ export default {
   ),
   data () {
     return {
-      idleTimeout: null,
+      idleTimeout: null,      
       signedIn: this.$store.getters.authenticatedUser != null
     }
   }

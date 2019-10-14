@@ -23,6 +23,14 @@ let router = new Router({
       }
     },    
     {
+      path: '/account/:accountId',
+      name: 'account',
+      component: () => import(/* webpackChunkName: "portal" */ './views/Account.vue'),
+      meta: { 
+        requiresAuth: true
+      }
+    },        
+    {
       path: '/signup',
       name: 'signup',
       component: () => import(/* webpackChunkName: "signup" */ './views/SignUp.vue')

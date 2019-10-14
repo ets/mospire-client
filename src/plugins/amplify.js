@@ -3,11 +3,10 @@ import Amplify, * as AmplifyModules from 'aws-amplify'
 import { Auth } from 'aws-amplify'
 import { AmplifyPlugin } from 'aws-amplify-vue'
 
-
 let aws_config = {
   apiGateway: {
     REGION: "us-east-1",
-    URL: "http://127.0.0.1:8000"
+    URL: "http://localhost:8000"
   },
   cognito: {
     REGION: "us-east-1",
