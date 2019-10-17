@@ -1,8 +1,11 @@
 <template>
     <div class="signin">
-      <div>
+      <v-row
+          align="center"
+          justify="center"
+        >
          <amplify-authenticator v-bind:authConfig="authConfig"></amplify-authenticator>
-      </div>      
+      </v-row>
     </div>
 </template>
 

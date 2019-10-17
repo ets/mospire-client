@@ -1,7 +1,37 @@
 <template>
-  <v-app>
-    <v-app-bar app>
+  <v-app id="mospire">    
+    <v-navigation-drawer v-model="drawer"
+      :clipped="$vuetify.breakpoint.lgAndUp" app>
+      <v-list dense>
+        <v-list-item link to="/dashboard">
+          <v-list-item-icon>
+            <v-icon>mdi-view-dashboard</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Dashboard</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+        <v-list-item link to="/accounts">
+          <v-list-item-icon>
+            <v-icon>mdi-folder-multiple-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>Accounts</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>        
+        <v-list-item link to="/about">
+          <v-list-item-icon>
+            <v-icon>mdi-information-outline</v-icon>
+          </v-list-item-icon>
+          <v-list-item-content>
+            <v-list-item-title>About</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-navigation-drawer>
+    <v-app-bar :clipped-left="$vuetify.breakpoint.lgAndUp" app>
       <v-toolbar-title class="headline text-uppercase">
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
         <span>Mospire</span>
         <span class="font-weight-light"> Portal</span>
       </v-toolbar-title>      
@@ -9,22 +39,18 @@
       <v-btn to="/" text>
         <span class="mr-2">Home</span>
       </v-btn>      
-      <v-btn v-if="signedIn" to="/dashboard" text>
-        <span class="mr-2">Dashboard</span>
-      </v-btn>            
       <v-btn v-if="!signedIn" to="/signin" text>
         <span class="mr-2">Sign In</span>
       </v-btn>            
       <v-btn v-if="signedIn" to="/signout" text>
         <span class="mr-2">Sign Out</span>
       </v-btn>                  
-      <v-btn to="/about" text>
-        <span class="mr-2">About</span>
-      </v-btn>
-    </v-app-bar>    
+    </v-app-bar>        
     <v-content>      
-      <router-view/>
-    </v-content>
+      <v-container fluid>
+        <router-view/>
+      </v-container>
+    </v-content>    
   </v-app>
 </template>
 
@@ -84,6 +110,7 @@ export default {
   ),
   data () {
     return {
+      drawer: null,
       idleTimeout: null,      
       signedIn: this.$store.getters.authenticatedUser != null
     }

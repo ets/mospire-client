@@ -1,13 +1,11 @@
 <template>
-<v-container>
-  <ReturnSpark/>
+<v-container>  
   <v-data-table
       :headers="headers"
       :items="accounts"
       :items-per-page="10"    
       v-on:click:row="showAccount"    
-      sort-by="broker_name"      
-      show-select
+      sort-by="broker_name"            
       class="elevation-1"    
       loading-text="Loading... Please wait"
     >
@@ -74,13 +72,8 @@
 <script>
 import { API } from 'aws-amplify'
 import { mapGetters } from 'vuex'
-import ReturnSpark from '@/components/ReturnSpark.vue'
-
 
 export default {
-  components: {
-    ReturnSpark
-  },
   mounted() {
     this.fetchDashboard();
   },
@@ -191,8 +184,8 @@ export default {
     return {
       crumbs: [
         {
-          text: 'Dashboard',          
-          to: '/dashboard',
+          text: 'Accounts',          
+          to: '/accounts',
           disabled: true,
         },                
       ],

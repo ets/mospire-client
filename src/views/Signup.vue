@@ -1,8 +1,11 @@
 <template>
     <div class="signup">
-      <div>
+      <v-row
+          align="center"
+          justify="center"
+        >
         <amplify-sign-up v-bind:signUpConfig="signUpConfig"></amplify-sign-up>
-      </div>      
+      </v-row>
     </div>        
 </template>
 

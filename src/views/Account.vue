@@ -253,8 +253,8 @@ export default {
     return {      
       crumbs: [
         {
-          text: 'Dashboard',          
-          to: '/dashboard',
+          text: 'Accounts',          
+          to: '/accounts',
         },        
         {
           text: 'Account',
