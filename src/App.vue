@@ -67,6 +67,7 @@ export default {
         Auth.currentAuthenticatedUser()
             .then(user => {
               this.$store.dispatch('setAuthenticatedUser', user)
+              this.createMospireUser()                
               this.signedIn = true              
               this.refreshIdleTimeout()
               if(this.$route.params.nextUrl != null){
@@ -82,7 +83,7 @@ export default {
         this.$store.dispatch('setAuthenticatedUser', null)
         this.signedIn = false
       } else if (info === 'signIn') { 
-        this.$router.push({name: 'signin'})
+        this.$router.push({name: 'signin'})        
       }
     });    
   },
@@ -93,6 +94,19 @@ export default {
     document.removeEventListener('click', this.refreshIdleTimeout)
   },
   methods:{
+    createMospireUser: function () {      
+      const userEmail = this.$store.getters.authenticatedUser.attributes.email
+      let name = this.$store.getters.authenticatedUserFirstName
+      let myInit = {
+        body: {
+          'email':  userEmail,
+          'first_name': name,
+        }
+      }
+      API.post('mospire', '/v1/users', myInit).catch(error => {
+          console.error("Unable to create mospire user: "+error)
+      });
+    },
     refreshIdleTimeout () {
       if(this.idleTimeout) clearTimeout(this.idleTimeout)
       if(this.signedIn) {

@@ -4,7 +4,6 @@
       :headers="headers"
       :items="accounts"
       :items-per-page="10"    
-      v-on:click:row="showAccount"    
       sort-by="broker_name"            
       class="elevation-1"    
       loading-text="Loading... Please wait"
@@ -51,6 +50,12 @@
         <v-icon
           small
           class="mr-2"
+          @click="showAccount(item)"
+        >
+          mdi-table-large
+        </v-icon>
+        <v-icon
+          small
           @click="editItem(item)"
         >
           edit
@@ -75,46 +80,16 @@ import { mapGetters } from 'vuex'
 
 export default {
   mounted() {
-    this.fetchDashboard();
+    this.fetchAccounts();
   },
   methods: { 
-    fetchDashboard: function () {
+    fetchAccounts: function () {
       API.get('mospire', '/v1/accounts').then(response => {          
-          this.accounts = response.accounts
-          if(this.accounts.length > 0){
-            // Pull IRR
-            let myInit = {
-              body: {
-              }
-            }
-            API.get('mospire', '/v1/transactions/analysis', myInit).then(response => {
-              
-            })
-          }
+          this.accounts = response.accounts          
       }).catch(error => {
-        if (error.status && error.response.status === 404){
-          this.createMospireUser()
-        }else{
-          console.log(error.response ? error.response : error.message)
-          //TODO: display errors by recording them in vuex and binding that in an Alert component in App
-        }        
+        console.log(error.response ? error.response : error.message)                 
       });
-    },
-    createMospireUser: function () {
-      const userEmail = this.$store.getters.authenticatedUser.attributes.email
-      let name = this.$store.getters.authenticatedUserFirstName
-      let myInit = {
-        body: {
-          'email':  userEmail,
-          'first_name': name,
-        }
-      }
-      API.post('mospire', '/v1/users', myInit).then(response => {
-          this.fetchDashboard();
-      }).catch(error => {
-          console.error("Unable to create mospire user: "+error)
-      });
-    },
+    },    
     showAccount(item){
       this.$router.push({name: 'account',  params: { accountId: item.id }})      
     },
