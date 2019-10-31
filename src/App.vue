@@ -79,9 +79,8 @@ export default {
             .catch(err => {
               this.signedIn = false
             });                
-      } else if (info === 'signedOut'){
-        this.$store.dispatch('setAuthenticatedUser', null)
-        this.signedIn = false
+      } else if (info === 'signedOut'){        
+        this.postSignout()
       } else if (info === 'signIn') { 
         this.$router.push({name: 'signin'})        
       }
@@ -91,6 +90,7 @@ export default {
     document.addEventListener('click', this.refreshIdleTimeout)
   },
   beforeDestroy: function () {
+    this.postSignout()
     document.removeEventListener('click', this.refreshIdleTimeout)
   },
   methods:{
@@ -107,10 +107,15 @@ export default {
           console.error("Unable to create mospire user: "+error)
       });
     },
-    refreshIdleTimeout () {
+    postSignout: function () {
+      this.$store.dispatch('setAuthenticatedUser', null)
+      this.signedIn = false
+    },
+    refreshIdleTimeout: function () {
       if(this.idleTimeout) clearTimeout(this.idleTimeout)
       if(this.signedIn) {
         this.idleTimeout = setTimeout(() => {
+          this.postSignout()
           this.$router.push({name: 'signout'})
         }, 30 * 60 * 1000)      
       }      
