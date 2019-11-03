@@ -11,6 +11,69 @@
     <template v-slot:item.txn_time="{ item }">
       <span>{{new Date(item.txn_time).toISOString().substr(0, 10)}}</span>
     </template>
+    <template v-slot:footer>
+      <v-dialog v-model="entryDialog" max-width="500px">       
+        <template v-slot:activator="{ on }">            
+          <v-btn        
+              v-on="on"       
+              dark
+              fab              
+              left
+              color="red"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+        </template>   
+        <v-card>
+          <v-card-title>
+            <span class="headline">{{ formTitle }}</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-menu
+                    v-model="hideDatePicker"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="editedItem.txn_time"
+                        label="Entry Date"
+                        prepend-icon="event"
+                        readonly
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="editedItem.txn_time" @input="hideDatePicker = false"></v-date-picker>
+                  </v-menu>
+                </v-col>
+              </v-row>                
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field v-model="editedItem.flow" type="number" label="Cash Flow"></v-text-field>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field v-model="editedItem.balance" type="number" label="Account Balance"></v-text-field>
+                </v-col>              
+              </v-row>
+            </v-container>
+          </v-card-text>
+
+          <v-card-actions>
+            <div class="flex-grow-1"></div>
+            <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+            <v-btn color="blue darken-1" text @click="save">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>             
+    </template>
     <template v-slot:top>
       <v-breadcrumbs large :items="crumbs"></v-breadcrumbs>
       <v-toolbar flat color="white">
@@ -20,9 +83,9 @@
         <div class="flex-grow-1"></div>    
 
         <v-toolbar-items>          
-          <v-dialog v-model="stmtDialog" max-width="500px">   
+          <v-dialog v-model="stmtDialog" max-width="750px">   
             <template v-slot:activator="{ on }">            
-              <v-btn color="blue darken-1" v-on="on" text>Upload Statements</v-btn>
+              <v-btn color="primary darken-1" v-on="on" text>Upload Statements<v-icon right dark>mdi-cloud-upload</v-icon></v-btn>
             </template>          
             <v-card>
               <v-card-title>
@@ -54,63 +117,8 @@
                 <v-btn color="blue darken-1" text @click="saveStmt">Save</v-btn>
               </v-card-actions>
             </v-card>
-          </v-dialog>
-          <v-dialog v-model="entryDialog" max-width="500px">       
-            <template v-slot:activator="{ on }">            
-              <v-btn color="blue darken-1" v-on="on" text>New Entry</v-btn>
-            </template>   
-            <v-card>
-              <v-card-title>
-                <span class="headline">{{ formTitle }}</span>
-              </v-card-title>
-              <v-card-text>
-                <v-container>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-menu
-                        v-model="hideDatePicker"
-                        :close-on-content-click="false"
-                        :nudge-right="40"
-                        transition="scale-transition"
-                        offset-y
-                        min-width="290px"
-                      >
-                        <template v-slot:activator="{ on }">
-                          <v-text-field
-                            v-model="editedItem.txn_time"
-                            label="Entry Date"
-                            prepend-icon="event"
-                            readonly
-                            v-on="on"
-                          ></v-text-field>
-                        </template>
-                        <v-date-picker v-model="editedItem.txn_time" @input="hideDatePicker = false"></v-date-picker>
-                      </v-menu>
-                    </v-col>
-                  </v-row>                
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.flow" type="number" label="Cash Flow"></v-text-field>
-                    </v-col>
-                  </v-row>
-                  <v-row>
-                    <v-col cols="12">
-                      <v-text-field v-model="editedItem.balance" type="number" label="Account Balance"></v-text-field>
-                    </v-col>              
-                  </v-row>
-                </v-container>
-              </v-card-text>
-
-              <v-card-actions>
-                <div class="flex-grow-1"></div>
-                <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
-                <v-btn color="blue darken-1" text @click="save">Save</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          </v-dialog>          
         </v-toolbar-items>
-
-
       </v-toolbar>
     </template>
     <template v-slot:item.action="{ item }">
@@ -181,13 +189,15 @@ export default {
     },
     saveStmt(){
       let transactions = []
-      for (const row of this.stmtCSV.replace(/(\r\n|\n|\r)/gm, ";").split(";")) {
+      for (const row of this.stmtCSV.trim().replace(/(\r\n|\n|\r)/gm, ";").split(";")) {
         const cols = row.split(",")
-        transactions.push({ 
-          txn_time: cols[0], 
-          flow: parseFloat(cols[1]), 
-          balance: parseFloat(cols[2])
-        })        
+        if (cols.length == 3 && cols[0].trim().length > 0){
+          transactions.push({ 
+            txn_time: cols[0], 
+            flow: parseFloat(cols[1]), 
+            balance: parseFloat(cols[2])
+          })        
+        }        
       }
       let myInit = {
         body: {
@@ -202,12 +212,12 @@ export default {
       });        
         
     },
-    save () {      
+    save () {         
       // v-textfield doesn't persist with number type...have to convert here
-      this.editedItem.balance = parseFloat(this.editedItem.balance)
-      this.editedItem.flow = parseFloat(this.editedItem.flow)
+        this.editedItem.balance = parseFloat(this.editedItem.balance)
+        this.editedItem.flow = parseFloat(this.editedItem.flow)
 
-      if (this.editedIndex > -1) {
+      if (this.editedIndex > -1) {        
         Object.assign(this.txns[this.editedIndex], this.editedItem)
         let myInit = {
           body: this.editedItem
@@ -215,11 +225,11 @@ export default {
         API.put('mospire', '/v1/transactions/'+this.$route.params.accountId+'/'+this.editedItem.id, myInit ).catch(error => {
             this.fetchTxns();
         });        
-      } else {
+      } else {                
         this.txns.push(this.editedItem)   
         let myInit = {
           body: {
-            transactions: [this.editedItem]
+            transactions: [{'txn_time':this.editedItem.txn_time,'balance':this.editedItem.balance,'flow':this.editedItem.flow}]
           }
         }            
         API.post('mospire', '/v1/transactions/'+this.$route.params.accountId, myInit ).then(this.fetchTxns()).catch(error => {

@@ -1,5 +1,8 @@
 <template>
 <v-container>  
+  <v-alert type="error" :value="alert" dark dismissible>
+      {{ alertMessage }} 
+  </v-alert>
   <v-data-table
       :headers="headers"
       :items="accounts"
@@ -8,20 +11,23 @@
       class="elevation-1"    
       loading-text="Loading... Please wait"
     >
-      <template v-slot:top>    
-        <v-breadcrumbs large :items="crumbs"></v-breadcrumbs>
-        <v-toolbar flat color="white">
-          <v-toolbar-title>Your Accounts</v-toolbar-title>
-          
-          <div class="flex-grow-1"></div>        
-          <v-dialog v-model="dialog" max-width="500px">          
-            <template v-slot:activator="{ on }">        
-              <v-btn color="blue darken-1" v-on="on" text>New Account</v-btn>    
+      <template v-slot:footer>
+        <v-dialog v-model="dialog" max-width="500px">          
+            <template v-slot:activator="{ on }">                      
+              <v-btn        
+                v-on="on"       
+                dark
+                fab              
+                left
+                color="red"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
             </template>
             <v-card>
               <v-card-title>
                 <span class="headline">{{ formTitle }}</span>
-              </v-card-title>
+              </v-card-title>              
               <v-card-text>
                 <v-container>
                   <v-row>
@@ -43,7 +49,13 @@
                 <v-btn color="blue darken-1" text @click="save">Save</v-btn>
               </v-card-actions>
             </v-card>
-          </v-dialog>
+          </v-dialog>        
+      </template>
+      <template v-slot:top>    
+        <v-breadcrumbs large :items="crumbs"></v-breadcrumbs>
+        <v-toolbar flat color="white">
+          <v-toolbar-title>Your Accounts</v-toolbar-title>
+          <div class="flex-grow-1"></div>                  
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
@@ -87,7 +99,10 @@ export default {
       API.get('mospire', '/v1/accounts').then(response => {          
           this.accounts = response.accounts          
       }).catch(error => {
-        console.log(error.response ? error.response : error.message)                 
+        let errorMsg = error.response ? error.response.data.description : error.message
+        // console.log(errorMsg)          
+        this.alertMessage = "Please try again. Unable to load your accounts due to: "+errorMsg
+        this.alert = true
       });
     },    
     showAccount(item){
@@ -104,7 +119,7 @@ export default {
       if ( confirm('Are you sure you want to delete this account?') ){
         this.accounts.splice(index, 1);
         API.del('mospire', '/v1/accounts/'+item.id).catch(error => {
-            this.fetchDashboard();
+            this.fetchAccounts();
         });        
       }        
     },
@@ -124,14 +139,14 @@ export default {
           body: this.editedItem
         }    
         API.put('mospire', '/v1/accounts/'+this.editedItem.id, myInit ).catch(error => {
-            this.fetchDashboard();
+            this.fetchAccounts();
         });        
       } else {
         this.accounts.push(this.editedItem)   
         let myInit = {
           body: this.editedItem
         }    
-        API.post('mospire', '/v1/accounts', myInit ).then(this.fetchDashboard()).catch(error => {
+        API.post('mospire', '/v1/accounts', myInit ).then(this.fetchAccounts()).catch(error => {
             this.accounts.splice(this.accounts.indexOf(this.editedItem), 1)
             console.error("Unable to create new account: "+error)            
         });        
@@ -157,6 +172,8 @@ export default {
   },
   data () {
     return {
+      alertMessage: 'Unable to complete your request. Please try again.',
+      alert: false,
       crumbs: [
         {
           text: 'Accounts',          

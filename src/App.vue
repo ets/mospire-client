@@ -58,22 +58,26 @@
 <script>
 import { mapGetters } from 'vuex'
 import { AmplifyEventBus } from 'aws-amplify-vue'
-import { Auth } from 'aws-amplify'
+import { Auth, API } from 'aws-amplify'
 
 export default {
-  async beforeCreate() {    
+  created() {    
     AmplifyEventBus.$on('authState', info => {
+      // console.log("Caught an event: "+info)
       if (info === 'signedIn') {
         Auth.currentAuthenticatedUser()
-            .then(user => {
-              this.$store.dispatch('setAuthenticatedUser', user)
-              this.createMospireUser()                
-              this.signedIn = true              
-              this.refreshIdleTimeout()
-              if(this.$route.params.nextUrl != null){
-                this.$router.push(this.$route.params.nextUrl)
-              }else{
-                this.$router.push({name: 'dashboard'})
+            .then(user => {              
+              if(!this.signedIn){
+                this.$store.dispatch('setAuthenticatedUser', user)
+                this.signedIn = true              
+                // console.log("Just set setAuthenticatedUser")                            
+                this.refreshIdleTimeout()
+                this.createMospireUser()                                
+                if(this.$route.params.nextUrl != null){
+                  this.$router.push(this.$route.params.nextUrl)
+                }else{
+                  this.$router.push({name: 'dashboard'})
+                }              
               }              
             })
             .catch(err => {
@@ -94,7 +98,7 @@ export default {
     document.removeEventListener('click', this.refreshIdleTimeout)
   },
   methods:{
-    createMospireUser: function () {      
+    createMospireUser() {      
       const userEmail = this.$store.getters.authenticatedUser.attributes.email
       let name = this.$store.getters.authenticatedUserFirstName
       let myInit = {

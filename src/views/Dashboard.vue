@@ -1,5 +1,8 @@
 <template>
 <v-container>
+  <v-alert type="error" :value="alert" dark dismissible>
+    {{ alertMessage }} 
+  </v-alert>
   <v-breadcrumbs large :items="crumbs"></v-breadcrumbs>
   <ReturnSpark/>
 </v-container>
@@ -33,8 +36,10 @@ export default {
             })
           }
       }).catch(error => {
-        console.log(error.response ? error.response : error.message)
-        //TODO: display errors by recording them in vuex and binding that in an Alert component in App
+        let errorMsg = error.response ? error.response.data.description : error.message
+        // console.log(error.message)          
+        this.alertMessage = "Please try again. Unable to load your dashboard due to: "+errorMsg
+        this.alert = true
       });
     },    
   },
@@ -46,6 +51,8 @@ export default {
   ),  
   data () {
     return {
+      alertMessage: 'Unable to complete your request. Please try again.',
+      alert: false,
       crumbs: [
         {
           text: 'Dashboard',          
