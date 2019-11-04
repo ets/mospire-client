@@ -58,7 +58,7 @@
           <div class="flex-grow-1"></div>                  
         </v-toolbar>
       </template>
-      <template v-slot:item.action="{ item }">
+      <template v-slot:item.action="{ item }">        
         <v-icon
           small
           class="mr-2"
@@ -191,6 +191,7 @@ export default {
           value: 'broker_name',
         },
         { text: 'Account Number', value: 'identifier' },
+        { text: 'Latest Entry', sortable: true, value: 'latest_entry'},
         { text: 'Actions', value: 'action', sortable: false },
       ],
       editedIndex: -1,
