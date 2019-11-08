@@ -10,7 +10,9 @@
   "dependencies": {
     "aws-amplify-vue": "^0.2.14",
     "core-js": "^2.6.5",
+    "echarts": "^4.4.0",
     "vue": "^2.6.10",
+    "vue-echarts": "^4.0.4",
     "vue-router": "^3.0.3",
     "vuetify": "^2.0.0",
     "vuex": "^3.0.1"

@@ -4,39 +4,19 @@
     {{ alertMessage }} 
   </v-alert>
   <v-breadcrumbs large :items="crumbs"></v-breadcrumbs>
-  <v-sparkline
-    :value="value"
-    :gradient="gradient"
-    :smooth="radius || false"
-    :padding="padding"
-    :line-width="width"
-    :stroke-linecap="lineCap"
-    :gradient-direction="gradientDirection"
-    :fill="fill"
-    :type="type"
-    :auto-line-width="autoLineWidth"
-    auto-draw
-  ></v-sparkline>
+  <v-chart :options="chart" autoresize="true" />
 </v-container>
 </template>
 
 <script>
 import { API } from 'aws-amplify'
 import { mapGetters } from 'vuex'
-import ReturnSpark from '@/components/ReturnSpark.vue'
-
-const gradients = [
-    ['#222'],
-    ['#42b3f4'],
-    ['red', 'orange', 'yellow'],
-    ['purple', 'violet'],
-    ['#00c6ff', '#F0F', '#FF0'],
-    ['#f72047', '#ffd200', '#1feaea'],
-  ]
+import ECharts from 'vue-echarts'
+import 'echarts/lib/chart/line'
 
 export default {
   components: {
-    ReturnSpark
+    'v-chart': ECharts
   },
   mounted() {
     this.fetchDashboard();
@@ -53,7 +33,7 @@ export default {
             }
             API.get('mospire', '/v1/transactions/analysis', myInit).then(response => {
               this.analysis = response.analysis   
-              this.value =[this.analysis['one_month']*100,
+              this.chart.series[0].data =[this.analysis['one_month']*100,
                 this.analysis['two_month']*100,
                 this.analysis['three_month']*100,
                 this.analysis['four_month']*100,
@@ -107,24 +87,46 @@ export default {
         },                
       ],
       accounts: [],
-      analysis: null,    
-      width: 2,
-      radius: 10,
-      padding: 8,
-      lineCap: 'round',
-      gradient: gradients[5],
-      value: [0, 2, 5, 9, 5, 10, 3, 5, 0, 0, 1, 8, 2, 9, 0],
-      gradientDirection: 'top',
-      gradients,
-      fill: false,
-      type: 'trend',
-      autoLineWidth: false,  
+      analysis: null,
+      chart:{
+        title:{
+          text: 'Your IRR'
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            containLabel: true
+        },
+        xAxis:{          
+          type: 'category',        
+          data : ['One','Two','Three','Four','Five','Six']                         
+        },
+        yAxis: {
+          axisLabel: {
+            formatter:  function (value) {                
+                return value.toFixed(3)
+            }
+          },
+          type: 'value'
+        },
+        series: [{
+          data: [],
+          type: 'line'
+        }]
+      }
     }
   }
 }
 </script>
-
-
-
-
-  
+<style>
+/**
+ * The default size is 600px×400px, for responsive charts
+ * you may need to set percentage values as follows (also
+ * don't forget to provide a size for the container).
+ */
+.echarts {
+  width: 100%;
+  height: 500px;
+}
+</style>
