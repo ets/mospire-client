@@ -94,8 +94,10 @@ export default {
     document.addEventListener('click', this.refreshIdleTimeout)
   },
   beforeDestroy: function () {
-    this.postSignout()
-    document.removeEventListener('click', this.refreshIdleTimeout)
+    if ("development" != process.env.NODE_ENV){
+      Auth.signOut()
+      this.postSignout()    
+    }    
   },
   methods:{
     createMospireUser() {      
@@ -111,16 +113,18 @@ export default {
           console.error("Unable to create mospire user: "+error)
       });
     },
-    postSignout: function () {
+    async postSignout() {
       this.$store.dispatch('setAuthenticatedUser', null)
       this.signedIn = false
+      document.removeEventListener('click', this.refreshIdleTimeout)      
     },
     refreshIdleTimeout: function () {
       if(this.idleTimeout) clearTimeout(this.idleTimeout)
       if(this.signedIn) {
         this.idleTimeout = setTimeout(() => {
+          Auth.signOut()
           this.postSignout()
-          this.$router.push({name: 'signout'})
+          this.$router.replace({name: 'home'}) 
         }, 30 * 60 * 1000)      
       }      
     }

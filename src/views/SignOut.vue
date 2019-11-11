@@ -15,8 +15,7 @@ export default {
     logout: async function () {
       Auth.signOut()
         .then(data => {
-          AmplifyEventBus.$emit('authState', 'signedOut')
-          this.$router.replace({name: 'home'})  
+          AmplifyEventBus.$emit('authState', 'signedOut')          
         })        
     },
   },
