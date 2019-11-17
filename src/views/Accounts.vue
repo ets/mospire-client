@@ -37,7 +37,7 @@
                   </v-row>
                   <v-row>
                     <v-col cols="12">
-                      <v-text-field v-model="editedItem.identifier" label="Account number"></v-text-field>
+                      <v-text-field v-model="editedItem.identifier" label="Account identifier"></v-text-field>
                     </v-col>              
                   </v-row>
                 </v-container>
@@ -190,7 +190,7 @@ export default {
           sortable: true,
           value: 'broker_name',
         },
-        { text: 'Account Number', value: 'identifier' },
+        { text: 'Account Identifier', value: 'identifier' },
         { text: 'Latest Entry', sortable: true, value: 'latest_entry'},
         { text: 'Actions', value: 'action', sortable: false },
       ],
