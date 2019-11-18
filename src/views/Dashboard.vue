@@ -14,13 +14,13 @@
     </v-col>
     <v-col cols="6">
       <v-card>
-        <v-card-title class="headline">Internal Rate of Return</v-card-title>
+        <v-card-title class="headline">Annualized Returns</v-card-title>
         <v-card-text>as of {{ new Date(analysis['end']).toLocaleDateString(undefined, {  
           day : 'numeric',
           month : 'short',
           year : 'numeric'
         }) }}</v-card-text>
-        <v-chart :options="chart_irr" style="height: 400px;" autoresize />
+        <v-chart :options="chart_returns" style="height: 400px;" autoresize />
       </v-card>
     </v-col>
     <v-col cols="6">
@@ -33,6 +33,10 @@
                 <td>Internal Rate of Return (IRR)</td>
                 <td v-if="analysis['irr']" :class="analysis['irr'] > 0 ? 'green-text' : 'red-text'">{{ (100 * analysis['irr']).toFixed(2) }}%</td>
               </tr>
+              <tr>
+                <td>Time Weighted Return (TWR)</td>
+                <td v-if="analysis['twr']" :class="analysis['twr'] > 0 ? 'green-text' : 'red-text'">{{ (100 * analysis['twr']).toFixed(2) }}%</td>
+              </tr>              
               <tr>
                 <td>Year to Date (YTD)</td>
                 <td v-if="analysis['ytd']" :class="analysis['ytd'] > 0 ? 'green-text' : 'red-text'">{{ (100 * analysis['ytd']).toFixed(2) }}%</td>
@@ -105,7 +109,7 @@ export default {
             API.get('mospire', '/v1/transactions/analysis', myInit).then(response => {
               this.analysis = response.analysis
               this.populatePerformanceChart();
-              this.populateIRRChart();
+              this.populateReturnsChart();
             })
           }
       }).catch(error => {
@@ -140,13 +144,15 @@ export default {
       }
       this.chart_perf.xAxis.data.reverse()
     },
-    populateIRRChart: function(){
-      this.chart_irr.xAxis[0].data.push("Entire Portfolio")
-      this.chart_irr.series[0].data.push( (100 * this.analysis['irr']).toFixed(2) )
+    populateReturnsChart: function(){
+      this.chart_returns.xAxis[0].data.push("Entire Portfolio")
+      this.chart_returns.series[0].data.push( (100 * this.analysis['irr']).toFixed(2) )
+      this.chart_returns.series[1].data.push( (100 * this.analysis['twr']).toFixed(2) )
       for (let aid in this.analysis['accounts']) {
         const account = this.accounts.find(x => x.id == aid)
-        this.chart_irr.xAxis[0].data.push( account.identifier )
-        this.chart_irr.series[0].data.push( (100 * this.analysis['accounts'][aid]['irr']).toFixed(2) )        
+        this.chart_returns.xAxis[0].data.push( account.identifier )
+        this.chart_returns.series[0].data.push( (100 * this.analysis['accounts'][aid]['irr']).toFixed(2) )
+        this.chart_returns.series[1].data.push( (100 * this.analysis['accounts'][aid]['twr']).toFixed(2) )
       }                    
     },     
   },          
@@ -169,12 +175,12 @@ export default {
       ],
       accounts: [],      
       analysis: null,
-      chart_irr:{
-        color: ['#3398DB'],
+      chart_returns:{
+        color: ['#3398DB'],        
         tooltip : {
             trigger: 'axis',
             formatter: function (param) {
-              return param[0].name + ": "+ parseFloat(param[0].value).toFixed(2) + "%";
+              return param[0].name + "<br>IRR: "+ parseFloat(param[0].value).toFixed(2) + "%<br>TWR: "+ parseFloat(param[1].value).toFixed(2) + "%";
             },
             axisPointer : {         
                 type : 'shadow'     
@@ -209,7 +215,18 @@ export default {
             {
                 name:'IRR',
                 type:'bar',
-                barWidth: '60%',
+                itemStyle: {
+                    normal: {
+                        color: '#d48265'
+                    }
+                },
+                barWidth: '40',
+                data:[]
+            },
+            {
+                name:'TWR',
+                type:'bar',
+                barWidth: '40',
                 data:[]
             }
         ]
@@ -242,8 +259,8 @@ export default {
               saveAsImage: {
                   show: true,
                   title: 'Save As Image'
-              },
-          },
+            },
+        },
           tooltip: { // same as option.tooltip
             show: true,
             formatter: function (param) {
