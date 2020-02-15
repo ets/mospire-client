@@ -176,6 +176,7 @@ export default {
       accounts: [],      
       analysis: null,
       chart_returns:{
+        legend: {},
         color: ['#3398DB'],        
         tooltip : {
             trigger: 'axis',
